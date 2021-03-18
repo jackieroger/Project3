@@ -241,3 +241,4 @@ def encode(seq):
     Arguments
     ---------
     """
+    pass
