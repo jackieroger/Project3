@@ -248,28 +248,58 @@
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="scripts.NN.NeuralNetwork.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.train" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trains the NeuralNetwork using data with input data and corresponding output data.</p>
+<dl class="py attribute">
+<dt id="scripts.NN.NeuralNetwork.epoch_losses">
+<code class="sig-name descname"><span class="pre">epoch_losses</span></code><a class="headerlink" href="#scripts.NN.NeuralNetwork.epoch_losses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average loss per epoch during training.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>input_values</strong> (<em>np.array of ints</em>) – Values for input data.</p></li>
-<li><p><strong>output_values</strong> (<em>np.array of ints</em>) – Values for output data.</p></li>
-<li><p><strong>learning_rate</strong> (<em>float</em>) – Learning rate for training. Optional. Default is 0.1.</p></li>
-<li><p><strong>num_epochs</strong> (<em>int</em>) – Number of epochs for training. Optional. Default is 10.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>epoch_losses</strong> – Average loss per epoch during training.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>np.array of floats</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.train">
+<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains the NeuralNetwork using data with input data and corresponding output data using batched gradient
+descent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_values</strong> (<em>np.array of ints</em>) – Values for input data.</p></li>
+<li><p><strong>output_values</strong> (<em>np.array of ints</em>) – Values for output data.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Number of samples to be used in each batch of training.</p></li>
+<li><p><strong>num_epochs</strong> (<em>int</em>) – Number of epochs for training. Optional. Default is 10.</p></li>
+<li><p><strong>learning_rate</strong> (<em>float</em>) – Learning rate for training. Optional. Default is 0.1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.predict">
+<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a set of input values, predicts output values using a trained NeuralNetwork.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_values</strong> (<em>np.array of ints</em>) – Values for input data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>predictions</strong> – Predictions based on input data (this is equivalent to the output layer).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="scripts.NN.encode">
+<code class="sig-prename descclassname"><span class="pre">scripts.NN.</span></code><code class="sig-name descname"><span class="pre">encode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encodes DNA sequence into a binary sequence using one hot encoding.</p>
 </dd></dl>
 
 <div class="toctree-wrapper compound">
