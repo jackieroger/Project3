@@ -27,7 +27,7 @@ from scripts import NN
 import numpy as np
 from sklearn.metrics import roc_auc_score
 
-# Create a 5x3x5 neural network
+# Create a 5x3x1 neural network
 example_nn = NN.NeuralNetwork(5,3,1)
 
 # Train model
@@ -37,7 +37,7 @@ example_nn.train(training_data_input, training_data_output)
 
 # Apply model to validation data & evaluate performance
 validation_data_input = np.array([[2,5,2,5,2], [1,1,1,4,4]])
-validation_data_output = np.array([[1]], [[0]])
+validation_data_output = np.array([[1], [0]])
 validation_data_predictions = example_nn.predict(validation_data_input)
 validation_data_auc = roc_auc_score(validation_data_output, validation_data_predictions)
 ```
