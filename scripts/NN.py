@@ -17,7 +17,7 @@ class NeuralNetwork:
     Attributes
     ----------
     seed : int
-        Seed for random number generation. Used for reproducibility.
+        Seed for random number generation. Used for reproducibility. Optional. Default is 0.
     input_layer : np.array of ints
         The input layer of the network, where each element represents a node in the layer.
     hidden_layer : np.array of ints
@@ -171,7 +171,7 @@ class NeuralNetwork:
         self.biases2 = self.biases2 - (learning_rate * np.sum(delta2, axis=0))
         self.biases1 = self.biases1 - (learning_rate * np.sum(delta1, axis=0))
 
-    def train(self, input_values, output_values, batch_size, num_epochs=10, learning_rate=0.1):
+    def train(self, input_values, output_values, batch_size=10, num_epochs=1000, learning_rate=0.1, loss_threshold=0.00000000001):
         """
         Trains the NeuralNetwork using data with input data and corresponding output data using batched gradient
         descent.
@@ -183,11 +183,15 @@ class NeuralNetwork:
         output_values : np.array of ints
             Values for output data.
         batch_size : int
-            Number of samples to be used in each batch of training.
+            Number of samples to be used in each batch of training. Optional. Default is 10.
         num_epochs : int
-            Number of epochs for training. Optional. Default is 10.
+            Number of epochs for training. Optional. Default is 1000.
         learning_rate : float
-            Learning rate for training. Optional. Default is 0.1.
+            Learning rate for training. Optional. Default is 0.00000000001.
+        loss_threshold : float or int
+            Loss threshold for stopping gradient descent. If loss is below this AND loss is no longer decreasing,
+            training stops and it is assumed that reasonable convergence is reached in the learned parameters.
+            Optional. Default is 0.001.
         """
         # Save epoch losses
         epoch_losses = []
@@ -197,19 +201,25 @@ class NeuralNetwork:
             b = 0 #batch index
             l = 0 #batch loss
             while b < input_values.shape[0]:
+                # Batch losses
+                bl = []
                 # Make input layer
                 self.input_layer = input_values[b:b+batch_size,:]
                 # Forward pass
                 self._forward()
                 # Compute losses using binary cross entropy
                 bce = self._bce(self.output_layer, output_values[b:b+batch_size,:])
-                l += bce
+                bl.append(bce)
                 # Backward pass
                 self._backward(self.output_layer, output_values[b:b+batch_size,:], learning_rate)
                 b += batch_size
-            epoch_losses.append(l)
+            # Average losses across batches to get average loss for that epoch
+            epoch_losses.append(np.mean(bl))
+            # Stop criterion for convergence (if loss is not decreasing & it's already small enough)
+            if e > 0 and epoch_losses[-1] > epoch_losses[-2] and l < loss_threshold:
+                break
         # Save epoch losses as class attribute
-        self.epoch_losses = epoch_losses
+        self.epoch_losses = np.array(epoch_losses)
 
     def predict(self, input_values):
         """
@@ -234,11 +244,109 @@ class NeuralNetwork:
 
 # UTILITY FUNCTIONS
 
-def encode(seq):
+def encode(seqs):
     """
-    Encodes DNA sequence into a binary sequence using one hot encoding.
+    Encodes DNA sequences into a binary sequences using one hot encoding.
 
     Arguments
     ---------
+    seq : np.array of str
+        DNA sequences to be encoded.
+
+    Returns
+    -------
+    bin_seqs : np.array of ints
+        Binary encoding of sequences.
     """
-    pass
+    # Make dict for encoding
+    enc_map = {"A": np.array([1,0,0,0]),
+               "T": np.array([0,1,0,0]),
+               "C": np.array([0,0,1,0]),
+               "G": np.array([0,0,0,1]),}
+    # Do encoding
+    bin_seqs = []
+    for s in seqs:
+        bin_seqs.append(np.array([enc_map[n] for n in s]).flatten())
+    return np.array(bin_seqs)
+
+def read_fasta(fasta_file):
+    """
+    Reads in fasta file and returns sequences.
+
+    Arguments
+    ---------
+    fasta_file : str
+        Name of file.
+
+    Returns
+    -------
+    seqs : np.array of str
+        Sequences from fasta file.
+    """
+    # Open fasta file
+    with open(fasta_file) as ff:
+        # Read lines
+        lines = ff.readlines()
+        # Strip whitespace & make everything uppercase
+        lines = [l.strip().upper() for l in lines]
+        # Remove any empty strings
+        lines = [l for l in lines if l != ""]
+        # Check which type of sequence file it is
+        if lines[0][0] == ">": # fasta with headers & containing multi-line sequences
+            # Make dict of sequences
+            seq_dict = {}
+            # Make sequence index
+            seq_i = -1
+            # Parse through lines and add each sequence
+            for i in range(len(lines)):
+                # If a new header is reached (new seq)
+                if lines[i][0] == ">":
+                    seq_i += 1
+                    seq_dict[seq_i] = ""
+                # Concatenate to current seq
+                else:
+                    seq_dict[seq_i] += lines[i]
+            return np.array(list(seq_dict.values()))
+        else: # sequence file without headers & containing single-line sequences
+            return np.array(lines)
+
+def sample_subseqs(seqs, k, n, exclude=np.array([]), seed=0):
+    """
+    Randomly subsample subsequences from an array of sequences.
+
+    Arguments
+    ---------
+    seqs : np.array
+        Sequences to be subsampled from.
+    k : int
+        Length of each subsequence.
+    n : int
+        Number of subsequences.
+    exclude = np.array of str
+        Sequences that should be excluded from consideration as an outputted subsequence. Optional. Default is empty string.
+    seed : int
+        Seed for random number generation. Used for reproducibility. Optional. Default is an empty array.
+
+    Returns
+    -------
+    subseqs : np.array of str
+        Subsequences.
+    """
+    # Pick n sequences
+    np.random.seed(seed)
+    seq_indices = np.random.randint(len(seqs), size=(n))
+    n_seqs = np.array(seqs)[seq_indices]
+    # Make list of subsequences
+    subseqs = []
+    # Pick kmers from each of the n sequences
+    for i in range(n):
+        np.random.seed(seed)
+        kmer_start = np.random.randint(len(n_seqs[i])-k)
+        kmer = n_seqs[i][kmer_start:kmer_start+k]
+        while kmer in list(exclude):
+            kmer_start = np.random.randint(len(n_seqs[i]) - k)
+            kmer = n_seqs[i][kmer_start:kmer_start + k]
+        subseqs.append(kmer)
+    # Return array of subseqs
+    return np.array(subseqs)
+
