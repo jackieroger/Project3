@@ -13,6 +13,8 @@ import numpy as np
 class NeuralNetwork:
     """
     Represents a neural network containing an input layer, a hidden layer, and an output layer.
+    There are two weight matrices: one for going from the input layer to the hidden layer, and another
+    for going from the hidden layer to the output layer. Similarly, there are two bias matrices.
 
     Attributes
     ----------
